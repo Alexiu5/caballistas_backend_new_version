@@ -1,5 +1,7 @@
+"use strict";
 const router = require('express').Router();
+const tipoDepartamento = require('./departamento.controller');
 
-const tipodocumentoController = require('./tipo_documento')
+router.get('/tipo_departamento', tipoDepartamento.find);
 
-router.use('/tipodocumento', )
+module.exports = router;
