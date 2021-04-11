@@ -1,7 +1,7 @@
 const api = require('./api')
 
 function init(server) {
-    server.use('/', function(req, res) {
+    server.get('/', function(req, res) {
         res.send('laksjfdlkajfdkljashd')
     });
 
