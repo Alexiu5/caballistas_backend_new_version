@@ -6,14 +6,27 @@ async function find(req, res) {
 		const result = await client.query("SELECT * FROM tipo_departamento");
 		const results = { results: result ? result.rows : null };
 		client.release();
-		res.send(results);
+		res.status(200).send(results)
 	} catch (err) {
 		console.error(err);
-		res.send("Error", err);
+		res.status(500).send(err)
 	}
 }
 
-function findById(req, res) {}
+async function findById(req, res) {
+	const { tipo_departamento } = req.params;
+
+	try {
+		const client = await pool.connect();
+		const result = await client.query(`SELECT * FROM tipo_departamento WHERE TIPO_DOCUMENTO = ${tipo_departamento}`);
+		const results = { results: result ? result.rows : null };
+		client.release();
+		res.status(200).send(results)
+	} catch (err) {
+		console.error(err);
+		res.status(500).send(err)
+	}
+}
 
 module.exports = {
 	find,
