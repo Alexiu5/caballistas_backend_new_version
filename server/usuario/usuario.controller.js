@@ -1,47 +1,82 @@
-'use-strict';
+"use-strict";
 
-const express = require('express');
-const Usuario = require('./usuario.service');
+const Usuario = require("./usuario.service");
 
-function findUser(req, res) {
-    
+async function findById(req, res) {
+    const { idCliente } = req.params;
+    let usuario;
+
+    try {
+        usuario = await Usuario.findById(idCliente);
+        res.status(200).send(usuario);
+    } catch (error) {
+        res.status(500).send(error);
+    }
 }
 
-function findUserById(req, res) {
-    
+async function findByDocument(req, res) {
+    const { tipoDocumento, numeroDocumento } = req.params;
+    let usuario;
+
+    try {
+        usuario = await Usuario.findByDocument(tipoDocumento, numeroDocumento);
+        res.status(200).send(usuario);
+    } catch (error) {
+        res.status(500).send(error);
+    }
 }
 
-function findUserByDocument(req, res) {
+async function findByEmail(req, res) {
+    const { email } = req.params;
+    let usuario;
 
+    try {
+        usuario = await Usuario.findByEmail(email);
+        res.status(200).send(usuario);
+    } catch (error) {
+        res.status(500).send(error);
+    }
 }
 
-function findUserByEmail(req, res) {
-    
+async function register(req, res) {
+    let usuario;
+
+    try {
+        usuario = await Usuario.register(req.body);
+        res.status(200).send(usuario);
+    } catch (error) {
+        res.status(500).send(error);
+    }
 }
 
-function registerInformacionCliente(req, res) {
+async function update(req, res) {
+    let usuario;
 
+    try {
+        usuario = await Usuario.update(req.body);
+        res.status(200).send(usuario);
+    } catch (error) {
+        res.status(500).send(error);
+    }
 }
 
-function registerUsuario(req, res) {
+async function deleteUser(req, res) {
+    const { idCliente } = req.params;
+    let usuario;
 
+    try {
+        usuario = await Usuario.deleteUser(idCliente);
+        res.status(201);
+    } catch (error) {
+        res.status(500).send(error);
+    }
 }
 
-function updateUsuario(req, res) {
-
-}
-
-function deleteUser(req, res) {
-
-}
-
-mnodule.exports = {
-    findUser,
-    findUserById,
-    findUserByDocument,
-    findUserByEmail,
-    registerInformacionCliente,
-    registerUsuario,
-    updateUsuario,
-    deleteUser
-}
+module.exports = {
+    findById,
+    findByDocument,
+    findByEmail,
+    register,
+    update,
+    deleteUser,
+};

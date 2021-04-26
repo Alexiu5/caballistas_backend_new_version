@@ -1,7 +1,12 @@
 "use strict";
 
 const router = require('express').Router();
-const coreRouter = require('../core/core.router');
+const CoreRouter = require('../core/core.router');
+const Usuario = require('../usuario/usuario.router');
 
-router.use('/core', coreRouter);
+router.use('/core', CoreRouter);
+// To complete
+router.use('/usuario', Usuario);
+
+
 module.exports = router;

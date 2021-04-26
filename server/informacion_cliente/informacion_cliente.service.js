@@ -5,7 +5,7 @@ const _ = require('lodash');
 
 async function register(params) {
     const query = `INSERT INTO INFORMACION_CLIENTE(ID_CLIENTE, TIPO_DOCUMENTO, NUMERO_DOCUMENTO, NOMBRES, TELEFONO, DIRECCION, ID_DEPARTAMENTO, ID_MUNICIPIO, APELLIDOS) VALUES (nextval($1), $2, $3, $4, $5, $6, $7, $8, $9)`;
-    const cliente = new Cliente(params.user).toArray();
+    const cliente = new Cliente(params).toArray();
 
     cliente[0] = 'informacion_cliente_id_cliente_seq';
 
