@@ -1,7 +1,7 @@
 "use strict";
 class Cliente { 
     constructor(cliente) {
-        this.id_cliente = cliente.id_cliente
+        this.id_cliente = cliente.id_cliente ? cliente.id_cliente : '' ;
         this.tipo_documento = cliente.tipo_documento
         this.numero_documento  = cliente.numero_documento
         this.nombres  = cliente.nombres

@@ -2,6 +2,11 @@
 
 const Usuario = require("./usuario.service");
 
+/**
+ * This method returns an user by id given
+ * @param {*} req 
+ * @param {*} res 
+ */
 async function findById(req, res) {
     const { idCliente } = req.params;
     let usuario;
@@ -13,7 +18,12 @@ async function findById(req, res) {
         res.status(500).send(error);
     }
 }
-
+/**
+ *  This method returns an user by 
+ *  Type of document and number of document
+ * @param {*} req 
+ * @param {*} res 
+ */
 async function findByDocument(req, res) {
     const { tipoDocumento, numeroDocumento } = req.params;
     let usuario;
@@ -26,6 +36,11 @@ async function findByDocument(req, res) {
     }
 }
 
+/**
+ * This method retuns an user by given an email
+ * @param {*} req 
+ * @param {*} res 
+ */
 async function findByEmail(req, res) {
     const { email } = req.params;
     let usuario;
@@ -38,6 +53,11 @@ async function findByEmail(req, res) {
     }
 }
 
+/**
+ * This method calls the service in charge of register an user
+ * @param {*} req 
+ * @param {*} res 
+ */
 async function register(req, res) {
     let usuario;
 
@@ -49,6 +69,11 @@ async function register(req, res) {
     }
 }
 
+/**
+ * This method calls the service in charge of update an user
+ * @param {*} req 
+ * @param {*} res 
+ */
 async function update(req, res) {
     let usuario;
 
@@ -60,6 +85,11 @@ async function update(req, res) {
     }
 }
 
+/**
+ * This method calls the service in charge of delete an user
+ * @param {*} req 
+ * @param {*} res 
+ */
 async function deleteUser(req, res) {
     const { idCliente } = req.params;
     let usuario;

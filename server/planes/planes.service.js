@@ -1,5 +1,5 @@
 "use strict";
-const PlanSuscripcion = require('../models/PlanSuscripcion');
+const PlanSuscripcion = require('./planes.model');
 const pool = require('../Service/database');
 
 // Register new plan Suscripcion
@@ -22,7 +22,7 @@ async function registerPlanSuscripcion(params) {
 	}
 }
 
-function findPlanesSuscripcion() {
+async function findPlanesSuscripcion() {
 	const query = 'SELECT * FROM TIPO_PLAN_SUSCRIPCION WHERE ACTIVO = $1';
 	const activo = "S";
 

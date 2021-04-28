@@ -1,6 +1,6 @@
 const pool = require("../Service/database");
 const UsuarioSistema = require("./usuario.model");
-const InformacionCliente = require("../informacion_cliente/informacion_cliente.service");
+const InformacionCliente = require("../informacion_cliente/informacion-cliente.service");
 
 async function find() {
     try {

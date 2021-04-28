@@ -1,6 +1,6 @@
 "use strict";
 
-const planSuscripcionService = require('./planes-suscripcion.service');
+const planSuscripcionService = require('./planes.service');
 
 function registerPlanSuscripcion(req, res) {
     return planSuscripcionService.registerPlanSuscripcion(req.body)

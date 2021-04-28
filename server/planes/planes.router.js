@@ -1,7 +1,6 @@
 "use strict";
-const express = require('express');
+const router = require('express').Router();
 const planSuscripcionController = require('./planes.controller');
-let router = express.Router();
 
 router.post('/agregarPlan', planSuscripcionController.registerPlanSuscripcion);
 router.get('/findPlanesSuscripcion', planSuscripcionController.findPlanesSuscripcion);
