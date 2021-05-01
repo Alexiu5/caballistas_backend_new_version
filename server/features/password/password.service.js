@@ -1,5 +1,5 @@
 'use-strict';
-const pool = require('../Service/database');
+const { requestQuery } =  require('../../Service/database');
 
 /**
  * Validar que los datos ingresados existen en la base de datos
@@ -7,15 +7,13 @@ const pool = require('../Service/database');
  */
 function cambiarContrasena(params) {
 	const query = 'UPDATE USUARIO_SISTEMA SET CONTRASENA = $2 WHERE ID_USUARIO  = $1';
-	const {id_usuario, contrasena} = params;
+	const { id_usuario, contrasena } = params;
 	const values = [id_usuario, contrasena];
 
 	try {
-		const client = await pool.connect();
-		const result = await client.query(query, values);
+		const result = await requestQuery(query, values);
 		const results = {result: result ? result.rows: null};
 
-		client.release();
 		return results;
 	} catch (e) {
 		throw new Error(e);

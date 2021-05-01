@@ -10,7 +10,7 @@ router.delete("/:idCliente", Usuario.deleteUser);
 router.get("/:idCliente", Usuario.findById);
 router.get("/email/:email", Usuario.findByEmail);
 router.get(
-    "/documento/:tipoDocumento&:numeroDocumento",
+    "/documentos/:tipoDocumento&:numeroDocumento",
     Usuario.findByDocument
 );
 
