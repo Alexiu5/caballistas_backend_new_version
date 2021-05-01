@@ -1,13 +1,13 @@
 "use strict";
 
 const router = require('express').Router();
-const CoreRouter = require('../core/core.router');
-const Usuario = require('../user/usuario.router');
-const planes = require('../planes/planes.router');
+const Usuario = require('../features/user/usuario.router');
+const planes = require('../features/planes/planes.router');
+const Region = require('../features/region/region.router');
 
-router.use('/core', CoreRouter);
 router.use('/user', Usuario);
 router.use('/planes', planes);
+router.use('/', Region);
 
 
 

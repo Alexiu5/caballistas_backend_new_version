@@ -1,64 +1,57 @@
-const pool = require("../Service/database");
-const UsuarioSistema = require("./usuario.model");
-const InformacionCliente = require("../info_clients/informacion-cliente.service");
+const { requestQuery } = require('../../Service/database');
+const UsuarioSistema = require('./usuario.model');
+const InformacionCliente = require('../info_clients/informacion-cliente.service');
 
 async function find() {
     try {
-        const client = await pool.connect();
         const query =
-            "SELECT IC.ID_CLIENTE, IC.NUMERO_DOCUMENTO, IC.NOMBRES, IC.APELLIDOS, US.CORREO FROM INFORMACION_CLIENTE IC INNER JOIN USUARIO_SISTEMA US ON IC.ID_CLIENTE = US.CLIENTE";
-        const result = await client.query(query);
+            'SELECT IC.ID_CLIENTE, IC.NUMERO_DOCUMENTO, IC.NOMBRES, IC.APELLIDOS, US.CORREO FROM INFORMACION_CLIENTE IC INNER JOIN USUARIO_SISTEMA US ON IC.ID_CLIENTE = US.CLIENTE';
+        const result = await requestQuery(query);
         const results = { result: result ? result.rows : null };
 
         client.release();
         return results;
     } catch (e) {
-        console.error("Find all users fails", e);
+        console.error('Find all users fails', e);
         throw new Error(e);
     }
 }
 
 async function findById(id_cliente) {
     try {
-        const client = await pool.connect();
         const query = `SELECT * FROM INFORMACION_CLIENTE WHERE ID_CLIENTE = ${id_cliente}`;
-        const result = await client.query(query);
+        const result = await requestQuery(query);
         const results = { result: result ? result.rows : null };
 
-        client.release();
         return results;
     } catch (e) {
-        console.error("Find all users fails", e);
+        console.error('Find all users fails', e);
         throw new Error(e);
     }
 }
 
 async function findByDocument(tipo_documento, numero_documento) {
     try {
-        const client = await pool.connect();
         const query = `SELECT * FROM INFORMACION_CLIENTE WHERE TIPO_DOCUMENTO = ${tipo_documento} AND NUMERO_DOCUMENTO = ${numero_documento}`;
-        const result = await client.query(query);
+        const result = await requestQuery(query);
         const results = { result: result ? result.rows : null };
 
-        client.release();
         return results;
     } catch (e) {
-        console.error("Find all users fails", e);
+        console.error('Find all users fails', e);
         throw new Error(e);
     }
 }
 
 async function findByEmail(correo) {
     try {
-        const client = await pool.connect();
         const query = `SELECT * FROM USUARIO_SISTEMA WHERE CORREO = ${correo}`;
-        const result = await client.query(query);
+        const result = await requestQuery(query);
         const results = { result: result ? result.rows : null };
 
-        client.release();
         return results;
     } catch (e) {
-        console.error("Find all users fails", e);
+        console.error('Find all users fails', e);
         throw new Error(e);
     }
 }
@@ -79,11 +72,9 @@ async function register(params) {
                 '',
                 3)`;
 
-        const client = await pool.connect();
-        const result = await client.query(query);
+        const result = await requestQuery(query);
         const results = { result: result ? result.rows : null };
 
-        client.release();
         return results;
     } catch (e) {
         throw new Error(e);
@@ -95,11 +86,9 @@ async function update(params) {
     const query = `UPDATE USUARIO_SISTEMA SET  CONTRASENA= ${contrasena}, TIPO_ESTADO= ${tipo_estado} WHERE CORREO= ${correo}`;
 
     try {
-        const client = await pool.connect();
-        const result = await client.query(query);
+        const result = await requestQuery(query);
         const results = { result: result ? result.rows : null };
 
-        client.release();
         return results;
     } catch (e) {
         throw new Error(e);
@@ -111,11 +100,9 @@ async function deleteUser(id_cliente) {
     const query = `UPDATE USUARIO_SISTEMA SET TIPO_ESTADO = ${tipo_estado} WHERE CLIENTE = ${id_cliente}`;
 
     try {
-        const client = await pool.connect();
-        const result = await client.query(query);
+        const result = await requestQuery(query);
         const results = { result: result ? result.rows : null };
 
-        client.release();
         return results;
     } catch (e) {
         throw new Error(e);
