@@ -4,7 +4,7 @@ const { sendEmail } = require('./verificar-email.service');
 
 /**
  * Metodo que permite enviar un mail para la validacion del correo electronico 
- * del usuario.
+ * del user.
  * 
  * Acepta como parametros opcionales el from, subject y text
  * 

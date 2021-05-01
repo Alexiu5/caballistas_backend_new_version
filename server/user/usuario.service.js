@@ -1,6 +1,6 @@
 const pool = require("../Service/database");
 const UsuarioSistema = require("./usuario.model");
-const InformacionCliente = require("../informacion_cliente/informacion-cliente.service");
+const InformacionCliente = require("../info_clients/informacion-cliente.service");
 
 async function find() {
     try {
@@ -65,17 +65,17 @@ async function findByEmail(correo) {
 
 async function register(params) {
     let informacionCliente;
-    let usuario;
+    let user;
 
     try {
         informacionCliente = await InformacionCliente.register(params); //This should be moved to controller logic
         params = { ...params, cliente: informacionCliente };
 
-        usuario = new UsuarioSistema(params).toArray();
+        user = new UsuarioSistema(params).toArray();
         const query = `INSERT INTO USUARIO_SISTEMA (ID_USUARIO, TIPO_USUARIO, CLIENTE, CORREO, CONTRASENA, TIPO_ESTADO)
             VALUES(nextval(usuario_sistema_id_usuario_seq), 2,
                 ${informacionCliente.id_cliente},
-                ${usuario[3]},
+                ${user[3]},
                 '',
                 3)`;
 

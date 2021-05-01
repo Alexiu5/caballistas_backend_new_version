@@ -9,22 +9,22 @@ function registerPlanSuscripcion(req, res) {
 
 function findPlanesSuscripcion(request, response) {
     return planSuscripcionService.findPlanesSuscripcion()
-        .then(usuario => {
-            return response.json(usuario);
+        .then(user => {
+            return response.json(user);
         });
 }
 
 function deletePlanSuscripcionById(request, response) {
     return planSuscripcionService.deletePlanSuscripcionById(request.params)
-        .then(usuario => {
-            return response.json(usuario);
+        .then(user => {
+            return response.json(user);
         });
 }
 
 function updatePlanSuscripcionById(request, response) {
     return planSuscripcionService.updatePlanSuscripcionById(request.body)
-        .then(usuario => {
-            return response.json(usuario);
+        .then(user => {
+            return response.json(user);
         });
 }
 

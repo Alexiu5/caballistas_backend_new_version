@@ -1,12 +1,12 @@
 "use strict";;
 class UsuarioSistema { 
-    constructor(usuario) {
-        this.id_usuario = usuario.id_usuario
-        this.tipo_usuario = usuario.tipo_usuario
-        this.cliente  = usuario.cliente
-        this.correo  = usuario.correo
-        this.contrasena  = usuario.contrasena
-        this.tipo_estado = usuario.tipo_estado
+    constructor(user) {
+        this.id_usuario = user.id_usuario
+        this.tipo_usuario = user.tipo_usuario
+        this.cliente  = user.cliente
+        this.correo  = user.correo
+        this.contrasena  = user.contrasena
+        this.tipo_estado = user.tipo_estado
     }
 };
 
