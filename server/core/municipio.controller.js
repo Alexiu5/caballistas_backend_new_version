@@ -1,6 +1,6 @@
 const pool = require('../Service/database');
 
-async function retrieveMunicipios(req, res) {
+async function findByTipo(req, res) {
 	const { tipo_departamento } = req.params;
 	const query = `SELECT * FROM TIPO_MUNICIPIO WHERE TIPO_DEPARTAMENTO = $1`;
 
@@ -17,5 +17,5 @@ async function retrieveMunicipios(req, res) {
 }
 
 module.exports = {
-	retrieveMunicipios
+	findByTipo
 }
