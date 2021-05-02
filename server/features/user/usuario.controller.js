@@ -1,6 +1,9 @@
 "use-strict";
 
-const Usuario = require("./usuario.service");
+const usuarioService = require("./usuario.service");
+const informacionCliente = require('../info_clients/informacion-cliente.service');
+const Usuario = require('./usuario.model');
+const InfoCliente = require('../info_clients/cliente.model');
 
 /**
  * This method returns an user by id given
@@ -12,7 +15,7 @@ async function findById(req, res) {
     let user;
 
     try {
-        user = await Usuario.findById(idCliente);
+        user = await usuarioService.findById(idCliente);
         res.status(200).send(user);
     } catch (error) {
         res.status(500).send(error);
@@ -29,7 +32,7 @@ async function findByDocument(req, res) {
     let user;
 
     try {
-        user = await Usuario.findByDocument(tipoDocumento, numeroDocumento);
+        user = await usuarioService.findByDocument(tipoDocumento, numeroDocumento);
         res.status(200).send(user);
     } catch (error) {
         res.status(500).send(error);
@@ -46,7 +49,7 @@ async function findByEmail(req, res) {
     let user;
 
     try {
-        user = await Usuario.findByEmail(email);
+        user = await usuarioService.findByEmail(email);
         res.status(200).send(user);
     } catch (error) {
         res.status(500).send(error);
@@ -54,15 +57,26 @@ async function findByEmail(req, res) {
 }
 
 /**
- * This method calls the service in charge of register an user
+ * This method calls the service in charge of register an user and register into 
+ * informacion sistema table.
  * @param {*} req 
  * @param {*} res 
  */
-async function register(req, res) {
+async function register({ body }, res) {
+    let usuario = new Usuario(body);
+    let infoCliente = body.info_cliente && new InfoCliente(body.info_cliente);
     let user;
+    let cliente;
+
+
+    if (!infoCliente) res.status(400).send('Bad request');
 
     try {
-        user = await Usuario.register(req.body);
+        cliente = await informacionCliente.register(infoCliente);
+        usuario.cliente = cliente.id_cliente; // it sets the client id into user object after client has been registed
+        user = await usuarioService.register(usuario);
+        user = {...user, info_cliente: cliente}
+
         res.status(200).send(user);
     } catch (error) {
         res.status(500).send(error);
@@ -78,7 +92,7 @@ async function update(req, res) {
     let user;
 
     try {
-        user = await Usuario.update(req.body);
+        user = await usuarioService.update(req.body);
         res.status(200).send(user);
     } catch (error) {
         res.status(500).send(error);
@@ -95,7 +109,7 @@ async function deleteUser(req, res) {
     let user;
 
     try {
-        user = await Usuario.deleteUser(idCliente);
+        user = await usuarioService.deleteUser(idCliente);
         res.status(201);
     } catch (error) {
         res.status(500).send(error);

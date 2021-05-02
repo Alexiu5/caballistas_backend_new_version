@@ -45,11 +45,10 @@ async function findByDocument(tipo_documento, numero_documento) {
 
 async function findByEmail(correo) {
     try {
-        const query = `SELECT * FROM USUARIO_SISTEMA WHERE CORREO = ${correo}`;
-        const result = await requestQuery(query);
-        const results = { result: result ? result.rows : null };
+        const query = `SELECT * FROM USUARIO_SISTEMA WHERE CORREO = $1`;
+        const result = await requestQuery(query, [correo]);
 
-        return results;
+        return result.rows;
     } catch (e) {
         console.error('Find all users fails', e);
         throw new Error(e);
@@ -57,25 +56,22 @@ async function findByEmail(correo) {
 }
 
 async function register(params) {
-    let informacionCliente;
-    let user;
+    if (!(params instanceof UsuarioSistema))
+        throw new Error('Type of params is not UsuarioSistema');
 
     try {
-        informacionCliente = await InformacionCliente.register(params); //This should be moved to controller logic
-        params = { ...params, cliente: informacionCliente };
+        let user = new UsuarioSistema(params);
+        const query =
+            `INSERT INTO USUARIO_SISTEMA (ID_USUARIO, TIPO_USUARIO, CLIENTE, CORREO, CONTRASENA, TIPO_ESTADO) VALUES (nextval('usuario_sistema_id_usuario_seq'), 1, $1, $2, $3, 1 )`;
 
-        user = new UsuarioSistema(params).toArray();
-        const query = `INSERT INTO USUARIO_SISTEMA (ID_USUARIO, TIPO_USUARIO, CLIENTE, CORREO, CONTRASENA, TIPO_ESTADO)
-            VALUES(nextval(usuario_sistema_id_usuario_seq), 2,
-                ${informacionCliente.id_cliente},
-                ${user[3]},
-                '',
-                3)`;
+        await requestQuery(query, [
+            user.cliente,
+            user.correo,
+            user.contrasena,
+        ]);
+        const results = await findByEmail(user.correo);
 
-        const result = await requestQuery(query);
-        const results = { result: result ? result.rows : null };
-
-        return results;
+        return results[0];
     } catch (e) {
         throw new Error(e);
     }
