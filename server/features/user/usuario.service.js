@@ -5,12 +5,11 @@ const InformacionCliente = require('../info_clients/informacion-cliente.service'
 async function find() {
     try {
         const query =
-            'SELECT IC.ID_CLIENTE, IC.NUMERO_DOCUMENTO, IC.NOMBRES, IC.APELLIDOS, US.CORREO FROM INFORMACION_CLIENTE IC INNER JOIN USUARIO_SISTEMA US ON IC.ID_CLIENTE = US.CLIENTE';
+            'SELECT US.ID_USUARIO, IC.ID_CLIENTE, IC.NUMERO_DOCUMENTO, IC.NOMBRES, IC.APELLIDOS, US.CORREO, US.TIPO_ESTADO, US.TIPO_USUARIO FROM INFORMACION_CLIENTE IC INNER JOIN USUARIO_SISTEMA US ON IC.ID_CLIENTE = US.CLIENTE';
         const result = await requestQuery(query);
         const results = { result: result ? result.rows : null };
 
-        client.release();
-        return results;
+        return result.rows;
     } catch (e) {
         console.error('Find all users fails', e);
         throw new Error(e);
@@ -18,12 +17,12 @@ async function find() {
 }
 
 async function findById(id_cliente) {
+    // 'SELECT US.ID_USUARIO, IC.ID_CLIENTE, IC.NUMERO_DOCUMENTO, IC.NOMBRES, IC.APELLIDOS, US.CORREO, US.TIPO_ESTADO, US.TIPO_USUARIO FROM USUARIO_SISTEMA us inner join informacion_cliente ic on us.cliente = ic.id_cliente where us.id_usuario = $1';
     try {
-        const query = `SELECT * FROM INFORMACION_CLIENTE WHERE ID_CLIENTE = ${id_cliente}`;
-        const result = await requestQuery(query);
-        const results = { result: result ? result.rows : null };
+        const query = 'SELECT * FROM USUARIO_SISTEMA WHERE ID_USUARIO = $1';
+        let usuarios = await requestQuery(query, [id_cliente]);
 
-        return results;
+        return usuarios.rowCount > 0 ? usuarios.rows[0] : {};
     } catch (e) {
         console.error('Find all users fails', e);
         throw new Error(e);
@@ -48,7 +47,7 @@ async function findByEmail(correo) {
         const query = `SELECT * FROM USUARIO_SISTEMA WHERE CORREO = $1`;
         const result = await requestQuery(query, [correo]);
 
-        return result.rows;
+        return result.rows[0];
     } catch (e) {
         console.error('Find all users fails', e);
         throw new Error(e);
@@ -61,14 +60,9 @@ async function register(params) {
 
     try {
         let user = new UsuarioSistema(params);
-        const query =
-            `INSERT INTO USUARIO_SISTEMA (ID_USUARIO, TIPO_USUARIO, CLIENTE, CORREO, CONTRASENA, TIPO_ESTADO) VALUES (nextval('usuario_sistema_id_usuario_seq'), 1, $1, $2, $3, 1 )`;
+        const query = `INSERT INTO USUARIO_SISTEMA (ID_USUARIO, TIPO_USUARIO, CLIENTE, CORREO, CONTRASENA, TIPO_ESTADO) VALUES (nextval('usuario_sistema_id_usuario_seq'), 2, $1, $2, '', 3 )`;
 
-        await requestQuery(query, [
-            user.cliente,
-            user.correo,
-            user.contrasena,
-        ]);
+        await requestQuery(query, [user.cliente, user.correo]);
         const results = await findByEmail(user.correo);
 
         return results[0];
@@ -77,15 +71,29 @@ async function register(params) {
     }
 }
 
-async function update(params) {
-    const { correo, contrasena, tipo_estado } = params.inf;
-    const query = `UPDATE USUARIO_SISTEMA SET  CONTRASENA= ${contrasena}, TIPO_ESTADO= ${tipo_estado} WHERE CORREO= ${correo}`;
-
+async function update({ correo, contrasena, tipo_estado, id_usuario }) {
     try {
-        const result = await requestQuery(query);
-        const results = { result: result ? result.rows : null };
+        // validates if user already exists
+        const currentUser = await findById(id_usuario);
+        if (!_isUserExist(currentUser)) throw Error('User not exist');
 
-        return results;
+        // Defines query string
+        let query = `UPDATE USUARIO_SISTEMA SET CONTRASENA= $1, TIPO_ESTADO= $2, CORREO= $3 WHERE ID_USUARIO= ${id_usuario}`;
+
+        // Create patch usert object
+        let patchUser = createPatchUser(currentUser, {
+            contrasena,
+            tipo_estado,
+            correo
+        });
+
+        await requestQuery(query, [
+            patchUser.contrasena,
+            patchUser.tipo_estado,
+            patchUser.correo
+        ]);
+        
+        return patchUser;
     } catch (e) {
         throw new Error(e);
     }
@@ -97,12 +105,43 @@ async function deleteUser(id_cliente) {
 
     try {
         const result = await requestQuery(query);
-        const results = { result: result ? result.rows : null };
 
-        return results;
+        return result.rows[0];
     } catch (e) {
         throw new Error(e);
     }
+}
+
+/**
+ * It recieves an user object and transforms it into Usuario sistema class
+ * @param {object} userObject
+ * @returns boolean
+ */
+function _isUserExist(userObject) {
+    let usuario = new UsuarioSistema(userObject);
+
+    return usuario.isValidUser();
+}
+
+/**
+ * This method comparates the data from the database against of request data
+ * @param {object} currentUser
+ * @param {object} requestUser
+ * @returns {UsuarioSistema}
+ */
+function createPatchUser(currentUser, { contrasena, tipo_estado, correo }) {
+    let user = new UsuarioSistema(currentUser);
+
+    user = {
+        ...user,
+        correo: correo !== undefined ? correo : currentUser.correo,
+        contrasena:
+            contrasena !== undefined ? contrasena : currentUser.contrasena,
+        tipo_estado:
+            tipo_estado !== undefined ? tipo_estado : currentUser.tipoEstado,
+    };
+
+    return user;
 }
 
 module.exports = {

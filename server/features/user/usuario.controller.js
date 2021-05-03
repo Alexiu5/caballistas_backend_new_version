@@ -5,6 +5,15 @@ const informacionCliente = require('../info_clients/informacion-cliente.service'
 const Usuario = require('./usuario.model');
 const InfoCliente = require('../info_clients/cliente.model');
 
+async function find(req, res) {
+    try {
+        let user = await usuarioService.find();
+        res.status(200).send(user);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+}
+
 /**
  * This method returns an user by id given
  * @param {*} req 
@@ -21,6 +30,7 @@ async function findById(req, res) {
         res.status(500).send(error);
     }
 }
+
 /**
  *  This method returns an user by 
  *  Type of document and number of document
@@ -117,6 +127,7 @@ async function deleteUser(req, res) {
 }
 
 module.exports = {
+    find,
     findById,
     findByDocument,
     findByEmail,
