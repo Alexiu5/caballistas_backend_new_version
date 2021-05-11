@@ -47,24 +47,22 @@ async function findById(id_cliente) {
 
     try {
         const result = await requestQuery(query);
-        const results = { result: result ? result.rows : null };
 
-        return results;
+        return result.rowCount > 0 ? result.rows : [];
     } catch (error) {
         throw new Error(e);
     }
 }
 
-async function findByDocument(tipoDocumento, nroDocumento) {
-    const query =
-        'SELECT * FROM informacion_cliente WHERE tipo_documento = $1 AND numero_documento = $2';
+async function findByDocType(tipo, numero) {
+    const query = 'SELECT * FROM informacion_cliente WHERE TIPO_DOCUMENTO=$1 AND NUMERO_DOCUMENTO=$2';
 
     try {
-        const result = await requestQuery(query, [tipoDocumento, nroDocumento]);
+        const result = await requestQuery(query, [tipo, numero]);
 
-        return result?.rows[0];
+        return result.rowCount > 0 ? result.rows : [];
     } catch (error) {
-        throw Error(error);
+        throw Error(error); 
     }
 }
 
@@ -93,4 +91,5 @@ module.exports = {
     register,
     update,
     findById,
+    findByDocType
 };

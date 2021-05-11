@@ -3,8 +3,9 @@
 const router = require('express').Router();
 const InformacionCliente = require('./informacion-cliente.controller');
 
-// router.get('/informacion-cliente/:idCliente');
-// router.get('/informacion-cliente/correo/:correo');
-// router.get('/informacion-cliente/documento/:tipoDocumento&:numeroDocumento');
+
+router.get('/:idCliente', InformacionCliente.findById);
+// router.get('/correo/:correo', InformacionCliente.findByMail);
+router.get('/document/:tipoDocumento/number/:nroDocumento', InformacionCliente.findByDocType);
 
 module.exports = router;
