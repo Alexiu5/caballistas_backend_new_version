@@ -1,30 +1,27 @@
 const { requestQuery } = require('../../Service/database');
 const Cliente = require('./cliente.model');
-const _ = require('lodash');
+const Query = require('../../core/query-constants');
 
-async function register(params) {
+async function register(cliente) {
     try {
         let infoCliente;
-        let isParamsValid = await validateParams(params);
+        let isParamsValid = await validateParams(cliente);
 
-        const query = `INSERT INTO INFORMACION_CLIENTE
-            (ID_CLIENTE, TIPO_DOCUMENTO, NUMERO_DOCUMENTO, NOMBRES, TELEFONO, DIRECCION, ID_DEPARTAMENTO, ID_MUNICIPIO, APELLIDOS)
-                VALUES
-                    (nextval($1), $2, $3, $4, $5, $6, $7, $8, $9)`;
+        if (!isParamsValid) {
+            throw new Error(`Client already created`);
+        } else {
+            infoCliente = cliente.toArray();
+            infoCliente[0] = 'informacion_cliente_id_cliente_seq';
 
-        if (!isParamsValid) throw Error('Params are not valid into register informacion cliente')
+            await requestQuery(Query.infoClient.register, infoCliente);
+        }
 
-        infoCliente = params.toArray();
-        infoCliente[0] = 'informacion_cliente_id_cliente_seq';
-
-        await requestQuery(query, infoCliente);
-
-        return await findByDocument(
-            params.tipo_documento,
-            params.numero_documento
+        return await findByDocType(
+            cliente.tipo_documento,
+            cliente.numero_documento
         );
     } catch (e) {
-        throw new Error(e);
+        throw new Error(e.message);
     }
 }
 
@@ -43,10 +40,11 @@ async function update({ id_cliente, numero_documento, nombres, apellidos }) {
 }
 
 async function findById(id_cliente) {
-    const query = `SELECT * FROM INFORMACION_CLIENTE WHERE ID_CLIENTE = ${id_cliente}`;
-
     try {
-        const result = await requestQuery(query);
+        const result = await requestQuery(
+            Query.infoClient.findById,
+            id_cliente
+        );
 
         return result.rowCount > 0 ? result.rows : [];
     } catch (error) {
@@ -55,14 +53,15 @@ async function findById(id_cliente) {
 }
 
 async function findByDocType(tipo, numero) {
-    const query = 'SELECT * FROM informacion_cliente WHERE TIPO_DOCUMENTO=$1 AND NUMERO_DOCUMENTO=$2';
-
     try {
-        const result = await requestQuery(query, [tipo, numero]);
+        const result = await requestQuery(Query.infoClient.findByDocType, [
+            tipo,
+            numero,
+        ]);
 
-        return result.rowCount > 0 ? result.rows : [];
+        return result.rowCount > 0 ? result.rows[0] : [];
     } catch (error) {
-        throw Error(error); 
+        throw Error(error);
     }
 }
 
@@ -72,7 +71,7 @@ async function validateParams(params) {
     let isParamsValid = params instanceof Cliente;
     let isClientCreated = await isClientAlreadyCreated(params);
 
-    return isParamsValid && isClientCreated;
+    return isParamsValid && !isClientCreated;
 }
 
 async function isClientAlreadyCreated({ tipo_documento, numero_documento }) {
@@ -81,7 +80,9 @@ async function isClientAlreadyCreated({ tipo_documento, numero_documento }) {
             'SELECT count(*) FROM informacion_cliente WHERE tipo_documento = $1 AND numero_documento = $2',
             [tipo_documento, numero_documento]
         );
-        return parseInt(result.rows[0].count) === 0;
+        const { count } = result?.rows[0];
+
+        return count && parseInt(count) >= 1 ? true : false;
     } catch (error) {
         throw Error(error);
     }
@@ -91,5 +92,5 @@ module.exports = {
     register,
     update,
     findById,
-    findByDocType
+    findByDocType,
 };

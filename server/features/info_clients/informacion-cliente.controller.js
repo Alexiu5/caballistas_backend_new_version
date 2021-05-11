@@ -28,14 +28,15 @@ async function findByDocType(req, res) {
     }
 }
 
+// Create client object and then register
 async function register(req, res) {
     try {
-        let infoCliente = new Cliente(req.body);
-        let result = InformacionClienteService.register(infoCliente);
+        const client = new Cliente(req.body);
+        let result = await InformacionClienteService.register(client);
 
         res.status(200).send(result);
     } catch (error) {
-        res.send(500).send(error);
+        res.status(500).send({ err: error.message});
     }
 }
 
