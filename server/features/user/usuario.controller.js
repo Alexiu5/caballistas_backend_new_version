@@ -1,6 +1,6 @@
-"use-strict";
+'use-strict';
 
-const usuarioService = require("./usuario.service");
+const usuarioService = require('./usuario.service');
 const informacionCliente = require('../info_clients/informacion-cliente.service');
 const Usuario = require('./usuario.model');
 const InfoCliente = require('../info_clients/cliente.model');
@@ -16,15 +16,15 @@ async function find(req, res) {
 
 /**
  * This method returns an user by id given
- * @param {*} req 
- * @param {*} res 
+ * @param {*} req
+ * @param {*} res
  */
 async function findById(req, res) {
-    const { idCliente } = req.params;
+    const { idUsuario } = req.params;
     let user;
 
     try {
-        user = await usuarioService.findById(idCliente);
+        user = await usuarioService.findById(idUsuario);
         res.status(200).send(user);
     } catch (error) {
         res.status(500).send(error);
@@ -32,17 +32,20 @@ async function findById(req, res) {
 }
 
 /**
- *  This method returns an user by 
+ *  This method returns an user by
  *  Type of document and number of document
- * @param {*} req 
- * @param {*} res 
+ * @param {*} req
+ * @param {*} res
  */
 async function findByDocument(req, res) {
     const { tipoDocumento, numeroDocumento } = req.params;
     let user;
 
     try {
-        user = await usuarioService.findByDocument(tipoDocumento, numeroDocumento);
+        user = await usuarioService.findByDocument(
+            tipoDocumento,
+            numeroDocumento
+        );
         res.status(200).send(user);
     } catch (error) {
         res.status(500).send(error);
@@ -51,8 +54,8 @@ async function findByDocument(req, res) {
 
 /**
  * This method retuns an user by given an email
- * @param {*} req 
- * @param {*} res 
+ * @param {*} req
+ * @param {*} res
  */
 async function findByEmail(req, res) {
     const { email } = req.params;
@@ -67,10 +70,10 @@ async function findByEmail(req, res) {
 }
 
 /**
- * This method calls the service in charge of register an user and register into 
+ * This method calls the service in charge of register an user and register into
  * informacion sistema table.
- * @param {*} req 
- * @param {*} res 
+ * @param {*} req
+ * @param {*} res
  */
 async function register({ body }, res) {
     let usuario = new Usuario(body);
@@ -78,14 +81,13 @@ async function register({ body }, res) {
     let user;
     let cliente;
 
-
     if (!infoCliente) res.status(400).send('Bad request');
 
     try {
         cliente = await informacionCliente.register(infoCliente);
         usuario.cliente = cliente.id_cliente; // it sets the client id into user object after client has been registed
         user = await usuarioService.register(usuario);
-        user = {...user, info_cliente: cliente}
+        user = { ...user, info_cliente: cliente };
 
         res.status(200).send(user);
     } catch (error) {
@@ -95,13 +97,15 @@ async function register({ body }, res) {
 
 /**
  * This method calls the service in charge of update an user
- * @param {*} req 
- * @param {*} res 
+ * @param {*} req
+ * @param {*} res
  */
 async function update(req, res) {
     let user;
+    let { idUsuario } = req.params;
 
     try {
+        req.body = { ...req.body, id_usuario: idUsuario };
         user = await usuarioService.update(req.body);
         res.status(200).send(user);
     } catch (error) {
@@ -111,16 +115,15 @@ async function update(req, res) {
 
 /**
  * This method calls the service in charge of delete an user
- * @param {*} req 
- * @param {*} res 
+ * @param {*} req
+ * @param {*} res
  */
 async function deleteUser(req, res) {
-    const { idCliente } = req.params;
-    let user;
+    const { idUsuario } = req.params;
 
     try {
-        user = await usuarioService.deleteUser(idCliente);
-        res.status(201);
+        user = await usuarioService.deleteUser(idUsuario);
+        res.status(200).send(user);
     } catch (error) {
         res.status(500).send(error);
     }

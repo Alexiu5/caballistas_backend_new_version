@@ -1,7 +1,7 @@
 const { requestQuery } = require('../../Service/database');
 const UsuarioSistema = require('./usuario.model');
 const InformacionCliente = require('../info_clients/informacion-cliente.service');
-
+const Query = require('../../core/query-constants');
 async function find() {
     try {
         const query =
@@ -17,10 +17,8 @@ async function find() {
 }
 
 async function findById(id_cliente) {
-    // 'SELECT US.ID_USUARIO, IC.ID_CLIENTE, IC.NUMERO_DOCUMENTO, IC.NOMBRES, IC.APELLIDOS, US.CORREO, US.TIPO_ESTADO, US.TIPO_USUARIO FROM USUARIO_SISTEMA us inner join informacion_cliente ic on us.cliente = ic.id_cliente where us.id_usuario = $1';
     try {
-        const query = 'SELECT * FROM USUARIO_SISTEMA WHERE ID_USUARIO = $1';
-        let usuarios = await requestQuery(query, [id_cliente]);
+        let usuarios = await requestQuery(Query.user.findById, [id_cliente]);
 
         return usuarios.rowCount > 0 ? usuarios.rows[0] : {};
     } catch (e) {
@@ -31,8 +29,10 @@ async function findById(id_cliente) {
 
 async function findByDocument(tipo_documento, numero_documento) {
     try {
-        const query = `SELECT * FROM INFORMACION_CLIENTE WHERE TIPO_DOCUMENTO = ${tipo_documento} AND NUMERO_DOCUMENTO = ${numero_documento}`;
-        const result = await requestQuery(query);
+        const result = await requestQuery(Query.user.findByDocument, [
+            tipo_documento,
+            numero_documento
+        ]);
         const results = { result: result ? result.rows : null };
 
         return results;
@@ -44,8 +44,7 @@ async function findByDocument(tipo_documento, numero_documento) {
 
 async function findByEmail(correo) {
     try {
-        const query = `SELECT * FROM USUARIO_SISTEMA WHERE CORREO = $1`;
-        const result = await requestQuery(query, [correo]);
+        const result = await requestQuery(Query.user.findByEmail, [correo]);
 
         return result.rows[0];
     } catch (e) {
@@ -60,9 +59,9 @@ async function register(params) {
 
     try {
         let user = new UsuarioSistema(params);
-        const query = `INSERT INTO USUARIO_SISTEMA (ID_USUARIO, TIPO_USUARIO, CLIENTE, CORREO, CONTRASENA, TIPO_ESTADO) VALUES (nextval('usuario_sistema_id_usuario_seq'), 2, $1, $2, '', 3 )`;
+        user.id_cliente = 'usuario_sistema_id_usuario_seq';
 
-        await requestQuery(query, [user.cliente, user.correo]);
+        await requestQuery(Query.user.register, [user.id_cliente, user.cliente, user.correo]);
         const results = await findByEmail(user.correo);
 
         return results[0];
@@ -78,35 +77,43 @@ async function update({ correo, contrasena, tipo_estado, id_usuario }) {
         if (!_isUserExist(currentUser)) throw Error('User not exist');
 
         // Defines query string
-        let query = `UPDATE USUARIO_SISTEMA SET CONTRASENA= $1, TIPO_ESTADO= $2, CORREO= $3 WHERE ID_USUARIO= ${id_usuario}`;
 
         // Create patch usert object
         let patchUser = createPatchUser(currentUser, {
             contrasena,
             tipo_estado,
-            correo
+            correo,
         });
 
-        await requestQuery(query, [
+        await requestQuery(Query.user.update, [
             patchUser.contrasena,
             patchUser.tipo_estado,
-            patchUser.correo
+            patchUser.correo,
+            id_usuario
         ]);
-        
+
         return patchUser;
     } catch (e) {
         throw new Error(e);
     }
 }
 
-async function deleteUser(id_cliente) {
+async function deleteUser(idUsuario) {
     const tipo_estado = 2;
-    const query = `UPDATE USUARIO_SISTEMA SET TIPO_ESTADO = ${tipo_estado} WHERE CLIENTE = ${id_cliente}`;
 
     try {
-        const result = await requestQuery(query);
+        const user = await findById(idUsuario);
+        const { cliente } = user;
+        let result;
 
-        return result.rows[0];
+        if (cliente) {
+            result = await requestQuery(Query.user.delete, [
+                tipo_estado,
+                cliente
+            ]);
+        }
+
+        return result;
     } catch (e) {
         throw new Error(e);
     }
