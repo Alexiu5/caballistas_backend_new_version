@@ -109,14 +109,15 @@ async function register({ body }, res) {
 async function update(req, res) {
     let user;
     let { idUsuario } = req.params;
-    const { correo, tipo_estado, id_usuario } = req.body;
+    const { correo, tipo_estado, id_cliente, tipo_usuario } = req.body;
 
     try {
         user = await usuarioService.update({
             id_usuario: idUsuario,
             correo,
             tipo_estado,
-            id_usuario,
+            id_cliente,
+            tipo_usuario,
         });
         res.status(200).send(user);
     } catch (error) {

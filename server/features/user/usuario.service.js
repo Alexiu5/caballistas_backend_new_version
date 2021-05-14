@@ -102,7 +102,7 @@ async function register(params) {
  * @param {Usuario} Usuario
  * @returns Object
  */
-async function update({ correo, contrasena, tipo_estado, id_usuario }) {
+async function update({ id_usuario, correo, tipo_estado, tipo_usuario }) {
     try {
         // validates if user already exists
         const currentUser = await findById(id_usuario);
@@ -112,14 +112,15 @@ async function update({ correo, contrasena, tipo_estado, id_usuario }) {
 
         // Create patch usert object
         let patchUser = createPatchUser(currentUser, {
-            contrasena,
             tipo_estado,
             correo,
+            tipo_usuario,
         });
 
         await requestQuery(Query.user.update, [
             patchUser.tipo_estado,
             patchUser.correo,
+            patchUser.tipo_usuario,
             id_usuario,
         ]);
 
@@ -168,6 +169,8 @@ function _isUserExist(userObject) {
 
 /**
  * This method comparates the data from the database against of request data
+ *
+ *  To do: add tipo usuario field if is required - ask karen
  * @param {object} currentUser
  * @param {object} requestUser
  * @returns {UsuarioSistema}
