@@ -1,3 +1,5 @@
-const signIn = async (req, res) => {
-    
+const signIn = async (req, res) => {};
+
+module.exports = {
+    signIn,
 };

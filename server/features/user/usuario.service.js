@@ -1,13 +1,16 @@
 const { requestQuery } = require('../../Service/database');
 const UsuarioSistema = require('./usuario.model');
-const InformacionCliente = require('../info_clients/informacion-cliente.service');
 const Query = require('../../core/query-constants');
+
+/**
+ * This method finds all users
+ * @returns Object
+ */
 async function find() {
     try {
         const query =
             'SELECT US.ID_USUARIO, IC.ID_CLIENTE, IC.NUMERO_DOCUMENTO, IC.NOMBRES, IC.APELLIDOS, US.CORREO, US.TIPO_ESTADO, US.TIPO_USUARIO FROM INFORMACION_CLIENTE IC INNER JOIN USUARIO_SISTEMA US ON IC.ID_CLIENTE = US.CLIENTE';
         const result = await requestQuery(query);
-        const results = { result: result ? result.rows : null };
 
         return result.rows;
     } catch (e) {
@@ -15,7 +18,11 @@ async function find() {
         throw new Error(e);
     }
 }
-
+/**
+ * this method finds an user by id
+ * @param {int} id_cliente
+ * @returns
+ */
 async function findById(id_cliente) {
     try {
         let usuarios = await requestQuery(Query.user.findById, [id_cliente]);
@@ -27,11 +34,17 @@ async function findById(id_cliente) {
     }
 }
 
+/**
+ * This method finds an user by document type and document number
+ * @param {string} tipo_documento
+ * @param {string} numero_documento
+ * @returns Object
+ */
 async function findByDocument(tipo_documento, numero_documento) {
     try {
         const result = await requestQuery(Query.user.findByDocument, [
             tipo_documento,
-            numero_documento
+            numero_documento,
         ]);
         const results = { result: result ? result.rows : null };
 
@@ -42,6 +55,11 @@ async function findByDocument(tipo_documento, numero_documento) {
     }
 }
 
+/**
+ * This method finds an user by email
+ * @param {string} correo
+ * @returns Object
+ */
 async function findByEmail(correo) {
     try {
         const result = await requestQuery(Query.user.findByEmail, [correo]);
@@ -53,6 +71,11 @@ async function findByEmail(correo) {
     }
 }
 
+/**
+ * This method register an user into the database
+ * @param {Object} params
+ * @returns Object
+ */
 async function register(params) {
     if (!(params instanceof UsuarioSistema))
         throw new Error('Type of params is not UsuarioSistema');
@@ -61,7 +84,11 @@ async function register(params) {
         let user = new UsuarioSistema(params);
         user.id_cliente = 'usuario_sistema_id_usuario_seq';
 
-        await requestQuery(Query.user.register, [user.id_cliente, user.cliente, user.correo]);
+        await requestQuery(Query.user.register, [
+            user.id_cliente,
+            user.cliente,
+            user.correo,
+        ]);
         const results = await findByEmail(user.correo);
 
         return results[0];
@@ -70,6 +97,11 @@ async function register(params) {
     }
 }
 
+/**
+ * This method update contrasena, tipo-estado and correo
+ * @param {Usuario} Usuario
+ * @returns Object
+ */
 async function update({ correo, contrasena, tipo_estado, id_usuario }) {
     try {
         // validates if user already exists
@@ -89,7 +121,7 @@ async function update({ correo, contrasena, tipo_estado, id_usuario }) {
             patchUser.contrasena,
             patchUser.tipo_estado,
             patchUser.correo,
-            id_usuario
+            id_usuario,
         ]);
 
         return patchUser;
@@ -98,6 +130,11 @@ async function update({ correo, contrasena, tipo_estado, id_usuario }) {
     }
 }
 
+/**
+ * This method updates into the database the tipo_estado of an user
+ * @param {string} idUsuario
+ * @returns
+ */
 async function deleteUser(idUsuario) {
     const tipo_estado = 2;
 
@@ -109,7 +146,7 @@ async function deleteUser(idUsuario) {
         if (cliente) {
             result = await requestQuery(Query.user.delete, [
                 tipo_estado,
-                cliente
+                cliente,
             ]);
         }
 
