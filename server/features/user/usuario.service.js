@@ -118,7 +118,6 @@ async function update({ correo, contrasena, tipo_estado, id_usuario }) {
         });
 
         await requestQuery(Query.user.update, [
-            patchUser.contrasena,
             patchUser.tipo_estado,
             patchUser.correo,
             id_usuario,
