@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 const core = require('../core');
 const UsuarioService = require('../features/user/usuario.service');
-const AppError = require('../utils/appError');
 
 const login = async (req, res) => {
     try {
@@ -38,6 +37,7 @@ const signToken = (id) => {
  */
 const protect = async (req, res, next) => {
     let token;
+    let userDecoded;
 
     // 1). Get token and check if it's there
     if (
@@ -49,32 +49,19 @@ const protect = async (req, res, next) => {
 
     // TO-DO: refactor of this validation
     if (!token) {
-        return next(
-            core.handleUnauthorized(
-                res,
-                new AppError(
-                    'you not are logged in',
-                    core.statusCode.unauthorized
-                )
-            )
-        );
+        return next(core.handleUnauthorized(res, 'you not are logged in'));
     }
 
     // 2. Verification token
     try {
         const decode = await jwt.verify(token, process.env.JWT_SECRET);
-        const userDecoded = await UsuarioService.findById(decode.id);
+        userDecoded = await UsuarioService.findById(decode.id);
 
         if (!userDecoded || !userDecoded.isUserValid()) {
-            return next(
-                core.handleUnauthorized(
-                    res,
-                    new AppError('User not found', core.statusCode.unauthorized)
-                )
-            );
+            return next(core.handleUnauthorized(res, 'User not found'));
         }
     } catch (error) {
-        core.handleBadRequest(res, new AppError(error.message));
+        core.handleBadRequest(res, error.message);
     }
 
     req.user = userDecoded;
@@ -82,7 +69,21 @@ const protect = async (req, res, next) => {
     next();
 };
 
+const restrictTo = (...roles) => {
+    return (req, res, next) => {
+        // validate user role
+        const { user } = req;
+
+        if (user || !roles.includes(user.tipo_usuario)) {
+            return next(core.handleForbidden(res, 'User unauthorized'));
+        }
+
+        next();
+    };
+};
+
 module.exports = {
     login,
     protect,
+    restrictTo,
 };

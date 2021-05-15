@@ -1,3 +1,5 @@
+const AppError = require('../utils/appError');
+
 const statusCode = {
     ok: 200,
     created: 201,
@@ -18,25 +20,32 @@ const handleCreated = (res, message) => {
     return res.status(statusCode.created).send(message);
 };
 const handleNoContent = (res, message) => {
-    return res.status(statusCode.noContent).send(message);
+    const error = new AppError(message, statusCode.noContent);
+    return res.status(statusCode.noContent).send(error);
 };
 const handleBadRequest = (res, message) => {
-    return res.status(statusCode.badRequest).send(message);
+    const error = new AppError(message, statusCode.badRequest);
+    return res.status(statusCode.badRequest).send(error);
 };
 const handleUnauthorized = (res, message) => {
-    return res.status(statusCode.unauthorized).send(message);
+    const error = new AppError(message, statusCode.unauthorized);
+    return res.status(statusCode.unauthorized).send(error);
 };
 const handleForbidden = (res, message) => {
-    return res.status(statusCode.forbidden).send(message);
+    const error = new AppError(message, statusCode.forbidden);
+    return res.status(statusCode.forbidden).send(error);
 };
 const handleNotFound = (res, message) => {
-    return res.status(statusCode.notFound).json(message);
+    const error = new AppError(message, statusCode.notFound);
+    return res.status(statusCode.notFound).json(error);
 };
 const handleServerError = (res, message) => {
-    return res.status(statusCode.serverError).send(message);
+    const error = new AppError(message, statusCode.serverError);
+    return res.status(statusCode.serverError).send(error);
 };
 const handleBadGateway = (res, message) => {
-    return res.status(statusCode.badGateway).send(message);
+    const error = new AppError(message, statusCode.badGateway);
+    return res.status(statusCode.badGateway).send(error);
 };
 
 module.exports = {
