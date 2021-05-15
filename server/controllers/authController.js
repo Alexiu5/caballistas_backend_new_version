@@ -78,6 +78,7 @@ const protect = async (req, res, next) => {
     } catch (error) {
         core.handleBadRequest(res, new AppError(error.message));
     }
+
     next();
 };
 
