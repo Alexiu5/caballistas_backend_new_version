@@ -2,8 +2,6 @@ const jwt = require('jsonwebtoken');
 const core = require('../core');
 const UsuarioService = require('../features/user/usuario.service');
 const AppError = require('../utils/appError');
-// const Usuario = require('../feafdfldkjf;alsdtures/user/usuario.model');
-// const catchAsync = require('../utils/catchAsync');
 
 const login = async (req, res) => {
     try {
@@ -65,9 +63,9 @@ const protect = async (req, res, next) => {
     // 2. Verification token
     try {
         const decode = await jwt.verify(token, process.env.JWT_SECRET);
-        const response = await UsuarioService.findById(decode.id);
+        const userDecoded = await UsuarioService.findById(decode.id);
 
-        if (!response || !response.isUserValid()) {
+        if (!userDecoded || !userDecoded.isUserValid()) {
             return next(
                 core.handleUnauthorized(
                     res,
@@ -79,6 +77,8 @@ const protect = async (req, res, next) => {
         core.handleBadRequest(res, new AppError(error.message));
     }
 
+    req.user = userDecoded;
+    // Grant access to the route
     next();
 };
 
