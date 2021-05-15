@@ -30,7 +30,7 @@ const handleForbidden = (res, message) => {
     return res.status(statusCode.forbidden).send(message);
 };
 const handleNotFound = (res, message) => {
-    return res.status(statusCode.notFound).send(message);
+    return res.status(statusCode.notFound).json(message);
 };
 const handleServerError = (res, message) => {
     return res.status(statusCode.serverError).send(message);
@@ -49,4 +49,5 @@ module.exports = {
     handleNotFound,
     handleServerError,
     handleBadGateway,
+    statusCode,
 };

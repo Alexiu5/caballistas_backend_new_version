@@ -1,10 +1,11 @@
 const { requestQuery } = require('../../Service/database');
 const UsuarioSistema = require('./usuario.model');
 const Query = require('../../core/query-constants');
-
+const appError = require('../../utils/appError');
+const core = require('../../core');
 /**
  * This method finds all users
- * @returns Object
+ * @returns Array
  */
 async function find() {
     try {
@@ -21,13 +22,15 @@ async function find() {
 /**
  * this method finds an user by id
  * @param {int} id_cliente
- * @returns
+ * @returns UsuarioSistema
  */
 async function findById(id_cliente) {
     try {
-        let usuarios = await requestQuery(Query.user.findById, [id_cliente]);
+        let results = await requestQuery(Query.user.findById, [id_cliente]);
+        const usuario =
+            results.rowCount > 0 && new UsuarioSistema(results.rows[0]);
 
-        return usuarios.rowCount > 0 ? usuarios.rows[0] : {};
+        return usuario;
     } catch (e) {
         console.error('Find all users fails', e);
         throw new Error(e);
@@ -38,7 +41,7 @@ async function findById(id_cliente) {
  * This method finds an user by document type and document number
  * @param {string} tipo_documento
  * @param {string} numero_documento
- * @returns Object
+ * @returns UsuarioSistema
  */
 async function findByDocument(tipo_documento, numero_documento) {
     try {
@@ -46,9 +49,10 @@ async function findByDocument(tipo_documento, numero_documento) {
             tipo_documento,
             numero_documento,
         ]);
-        const results = { result: result ? result.rows : null };
+        const usuario =
+            result.rowCount > 0 && new UsuarioSistema(result.rows[0]);
 
-        return results;
+        return usuario;
     } catch (e) {
         console.error('Find all users fails', e);
         throw new Error(e);
@@ -58,13 +62,15 @@ async function findByDocument(tipo_documento, numero_documento) {
 /**
  * This method finds an user by email
  * @param {string} correo
- * @returns Object
+ * @returns UsuarioSistema
  */
 async function findByEmail(correo) {
     try {
         const result = await requestQuery(Query.user.findByEmail, [correo]);
+        const usuario =
+            result.rowCount > 0 && new UsuarioSistema(result.rows[0]);
 
-        return result.rows[0];
+        return usuario;
     } catch (e) {
         console.error('Find all users fails', e);
         throw new Error(e);
@@ -91,7 +97,7 @@ async function register(params) {
         ]);
         const results = await findByEmail(user.correo);
 
-        return results[0];
+        return results;
     } catch (e) {
         throw new Error(e);
     }
@@ -156,6 +162,23 @@ async function deleteUser(idUsuario) {
     }
 }
 
+async function login(email, password) {
+    try {
+        const response = await requestQuery(Query.user.login, [
+            email,
+            password,
+        ]);
+
+        if (!response.rows[0]) {
+            throw new appError('User not found', core.statusCode.notFound);
+        }
+
+        return new UsuarioSistema(response.rows[0]);
+    } catch (error) {
+        throw error;
+    }
+}
+
 /**
  * It recieves an user object and transforms it into Usuario sistema class
  * @param {object} userObject
@@ -173,7 +196,7 @@ function _isUserExist(userObject) {
  *  To do: add tipo usuario field if is required - ask karen
  * @param {object} currentUser
  * @param {object} requestUser
- * @returns {UsuarioSistema}
+ * @returns UsuarioSistema
  */
 function createPatchUser(currentUser, { contrasena, tipo_estado, correo }) {
     let user = new UsuarioSistema(currentUser);
@@ -198,4 +221,5 @@ module.exports = {
     register,
     update,
     deleteUser,
+    login,
 };

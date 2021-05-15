@@ -16,8 +16,8 @@ class UsuarioSistema {
         this.tipo_estado = tipo_estado;
     }
 
-    isValidUser() {
-        return this.cliente && this.correo;
+    isUserValid() {
+        return this.id_usuario && this.correo && this.tipo_estado;
     }
 }
 
