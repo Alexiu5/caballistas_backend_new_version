@@ -25,10 +25,14 @@ async function find() {
  * @returns UsuarioSistema
  */
 async function findById(id_cliente) {
+    let usuario;
+
     try {
         let results = await requestQuery(Query.user.findById, [id_cliente]);
-        const usuario =
-            results.rowCount > 0 && new UsuarioSistema(results.rows[0]);
+
+        if (results.rowCount > 0) {
+            usuario = new UsuarioSistema(results.rows[0]);
+        }
 
         return usuario;
     } catch (e) {
@@ -44,13 +48,17 @@ async function findById(id_cliente) {
  * @returns UsuarioSistema
  */
 async function findByDocument(tipo_documento, numero_documento) {
+    let usuario;
+
     try {
         const result = await requestQuery(Query.user.findByDocument, [
             tipo_documento,
             numero_documento,
         ]);
-        const usuario =
-            result.rowCount > 0 && new UsuarioSistema(result.rows[0]);
+
+        if (result.rowCount > 0) {
+            usuario = new UsuarioSistema(result.rows[0]);
+        }
 
         return usuario;
     } catch (e) {
@@ -65,10 +73,12 @@ async function findByDocument(tipo_documento, numero_documento) {
  * @returns UsuarioSistema
  */
 async function findByEmail(correo) {
+    let usuario;
     try {
         const result = await requestQuery(Query.user.findByEmail, [correo]);
-        const usuario =
-            result.rowCount > 0 && new UsuarioSistema(result.rows[0]);
+        if (result.rowCount > 0) {
+            usuario = new UsuarioSistema(result.rows[0]);
+        }
 
         return usuario;
     } catch (e) {

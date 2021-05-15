@@ -66,9 +66,8 @@ const protect = async (req, res, next) => {
     try {
         const decode = await jwt.verify(token, process.env.JWT_SECRET);
         const response = await UsuarioService.findById(decode.id);
-        const user = new Usuario(response);
 
-        if (!user.isUserValid()) {
+        if (!response || !response.isUserValid()) {
             return next(
                 core.handleUnauthorized(
                     res,
