@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const core = require('../core');
 const UsuarioService = require('../features/user/usuario.service');
 const AppError = require('../utils/appError');
-const Usuario = require('../features/user/usuario.model');
+// const Usuario = require('../feafdfldkjf;alsdtures/user/usuario.model');
 // const catchAsync = require('../utils/catchAsync');
 
 const login = async (req, res) => {

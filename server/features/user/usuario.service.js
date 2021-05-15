@@ -20,7 +20,7 @@ async function find() {
     }
 }
 /**
- * this method finds an user by id
+ * This method finds an user by id
  * @param {int} id_cliente
  * @returns UsuarioSistema
  */
