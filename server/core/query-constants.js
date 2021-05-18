@@ -18,7 +18,12 @@ const user = {
     login: 'SELECT * FROM USUARIO_SISTEMA WHERE CORREO = $1 AND CONTRASENA= $2',
 };
 
+const roles = {
+    findALl: 'SELECT (ID_TIPO_USUARIO, NOMBRE_USUARIO) FROM TIPO_USUARIO',
+};
+
 module.exports = {
     infoClient,
     user,
+    roles,
 };

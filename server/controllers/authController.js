@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const core = require('../core');
 const UsuarioService = require('../features/user/usuario.service');
+const Roles = require('../core/roles');
 
 const login = async (req, res) => {
     try {
@@ -69,12 +70,28 @@ const protect = async (req, res, next) => {
     next();
 };
 
+/**
+ * Middleware validates if the user has permitions to
+ * access to some route
+ * @param  {...any} roles
+ * @returns Async function
+ */
 const restrictTo = (...roles) => {
-    return (req, res, next) => {
-        // validate user role
+    return async (req, res, next) => {
         const { user } = req;
+        const allRoles = await Roles.findAll();
+        let isUserValid = false;
 
-        if (user || !roles.includes(user.tipo_usuario)) {
+        allRoles.map((role) => {
+            if (
+                user.tipo_usuario === parseInt(role.id) &&
+                roles.includes(role.name)
+            ) {
+                isUserValid = true;
+            }
+        });
+
+        if (!isUserValid) {
             return next(core.handleForbidden(res, 'User unauthorized'));
         }
 

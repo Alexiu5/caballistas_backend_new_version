@@ -14,7 +14,7 @@ const statusCode = {
 };
 
 const handleOk = (res, message) => {
-    return res.status(statusCode.ok).send(message);
+    return res.status(statusCode.ok).json(message);
 };
 const handleCreated = (res, message) => {
     return res.status(statusCode.created).send(message);
