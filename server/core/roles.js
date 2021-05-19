@@ -38,6 +38,7 @@ const ROLES = {
     admin: 'Administrador',
     client: 'Cliente',
 };
+
 module.exports = {
     Role,
     getRoles,
