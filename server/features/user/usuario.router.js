@@ -4,10 +4,17 @@ const express = require('express');
 const Usuario = require('./usuario.controller');
 const router = express.Router();
 
-router.post('/', Usuario.validateUser, Usuario.register);
-router.patch('/:idUsuario', Usuario.update);
-router.delete('/:idUsuario', Usuario.deleteUser);
-router.get('/:idUsuario', Usuario.findById);
+router
+    .route('/')
+    .post(Usuario.validateUser, Usuario.register)
+    .get(Usuario.register);
+
+router
+    .route('/:idUsuario')
+    .patch(Usuario.update)
+    .delete(Usuario.deleteUser)
+    .get(Usuario.findById);
+
 router.get('/email/:email', Usuario.findByEmail);
 router.get(
     '/documentos/:tipoDocumento&:numeroDocumento',
