@@ -1,5 +1,5 @@
 const { sendEmail } = require('./verify_email.service');
-
+const { handleServerError, handleOk } = require('../../core');
 /**
  * Metodo que permite enviar un mail para la validacion del correo electronico
  * del user.
@@ -17,10 +17,9 @@ function verificarEmail(request, response) {
 
     sendEmail(emailParams)
         .then((res) => {
-            response.status(200).send(res);
+            handleOk(response, res);
         })
         .catch((err) => {
-            console.error(err);
             response.status(500).send('Something broke!', err);
         });
 }
@@ -32,17 +31,16 @@ function verificarEmail(request, response) {
  */
 function envioPassword(request, response) {
     const emailParams = {
-        to: request.body.correo,
+        to: request.body.email,
         text: `<a href="https://caballistasfrontend.herokuapp.com/pass"> Ingresa al siguiente link para restablecer una nueva contraseña</a>`,
     };
 
     sendEmail(emailParams)
         .then((res) => {
-            response.status(200).send(res);
+            handleOk(response, res);
         })
         .catch((err) => {
-            console.error(err);
-            response.status(500).send('Something broke!', err);
+            handleServerError(response, err.message);
         });
 }
 
