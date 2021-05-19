@@ -197,7 +197,7 @@ async function login(email, password) {
 function _isUserExist(userObject) {
     let usuario = new UsuarioSistema(userObject);
 
-    return usuario.isValidUser();
+    return usuario.isUserValid();
 }
 
 /**

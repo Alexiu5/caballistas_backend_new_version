@@ -1,25 +1,25 @@
-"use strict";
-
 const nodemailer = require('nodemailer');
-const config = require('../../configs/index');
+const config = require('../../../config');
 
 const CONSTANTS = {
     EMAIL: {
-        TEXT: 'texto de ejemplo'
-    }
+        TEXT: 'texto de ejemplo',
+    },
 };
 
 /**
- * Metodo encargado de llamar la instancia de nodemailer y pasarle la configuracion 
- * Necesaria para enviar un email
+ *
  */
 async function createTransport() {
     return nodemailer.createTransport(config.email);
 }
 
 /**
- * Metodo que permite utilizar nodemailer
- * para enviar la validación de correo electronico
+ *
+ * Metodo que permite enviar un correo electronico
+ *
+ * @param {*} emailParams
+ * @returns
  */
 async function sendEmail(emailParams) {
     const transporter = await createTransport(),
@@ -30,15 +30,16 @@ async function sendEmail(emailParams) {
             if (error) reject(error);
 
             resolve({
-                message: 'mail enviado'
-            })
+                message: 'mail enviado',
+                info,
+            });
         });
     });
 }
 
 /**
- * Metodo encargado de crear una plantilla para el envio de emails
- * @param {Object} mailParams 
+ *
+ * @param {Object} mailParams
  */
 function createMailTemplate({ from, to, subject, text }) {
     return {
@@ -46,11 +47,11 @@ function createMailTemplate({ from, to, subject, text }) {
         to: to,
         subject: subject ? subject : config.emailDefaultCredentials.subject,
         text: text ? text : CONSTANTS.EMAIL.TEXT,
-    }
+    };
 }
 
 module.exports = {
     createTransport,
     sendEmail,
-    createMailTemplate
-}
+    createMailTemplate,
+};

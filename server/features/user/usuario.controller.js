@@ -6,6 +6,12 @@ const Usuario = require('./usuario.model');
 const InfoCliente = require('../info_clients/cliente.model');
 const core = require('../../core');
 
+const userStatus = {
+    active: 1,
+    inactive: 2,
+    pending: 3,
+};
+
 async function find(req, res) {
     try {
         let user = await usuarioService.find();
@@ -125,6 +131,25 @@ async function update(req, res) {
     }
 }
 
+async function verifyUser(req, res) {
+    try {
+        const { email, password } = req.body;
+        const user = await usuarioService.login(email, password);
+
+        if (user.isUserValid() && user.tipo_estado === userStatus.pending) {
+            let newUser = { ...user, tipo_estado: userStatus.active };
+
+            await usuarioService.update(newUser);
+
+            return core.handleCreated(res, 'User validated');
+        }
+
+        return core.handleNotFound(res, 'User not valid');
+    } catch (e) {
+        core.handleServerError(res, e.message);
+    }
+}
+
 /**
  * This method calls the service in charge of delete an user
  * @param {*} req
@@ -159,6 +184,7 @@ module.exports = {
     register,
     update,
     deleteUser,
+    verifyUser,
     // middlewares
     validateUser,
 };
