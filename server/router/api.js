@@ -24,6 +24,6 @@ router.use('/doc-types', DocTypes);
 router.post('/login', login);
 router.post('/email', Email.verificarEmail);
 router.post('/verify', usuarioController.verifyUser);
-router.post('/forgotpass', Email.envioPassword);
+router.route('/forgotpass').post(Email.envioPassword);
 
 module.exports = router;
