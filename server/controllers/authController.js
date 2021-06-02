@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const core = require('../core');
 const UsuarioService = require('../features/user/usuario.service');
 const Roles = require('../core/roles');
+const config = require('../config');
 
 const login = async (req, res) => {
     try {
@@ -24,8 +25,8 @@ const login = async (req, res) => {
 };
 
 const signToken = (id) => {
-    return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: process.env.JWT_EXPIRES_IN,
+    return jwt.sign({ id }, config.JWT_SECRET, {
+        expiresIn: config.JWT_EXPIRES_IN,
     });
 };
 
@@ -55,7 +56,7 @@ const protect = async (req, res, next) => {
 
     // 2. Verification token
     try {
-        const decode = await jwt.verify(token, process.env.JWT_SECRET);
+        const decode = await jwt.verify(token, config.JWT_SECRET);
         userDecoded = await UsuarioService.findById(decode.id);
 
         if (!userDecoded || !userDecoded.isUserValid()) {
