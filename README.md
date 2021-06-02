@@ -1,6 +1,6 @@
 # Revista Caballista Backend
 
-Proyecto creado en node js para la revista caballista
+Proyecto creado en node js para la revista caballistas
 
 ## Pre requisites
 
